@@ -1,8 +1,11 @@
+import os
 import streamlit as st
 from io import StringIO
 from utils import get_completion
 from utils import convert_to_latex
 from streamlit_extras.buy_me_a_coffee import button
+
+os.environ['OPENAI_API_KEY'] = st.secrets['OPENAI_API_KEY']
 
 st.title("Convert CSV to $\LaTeX$ with ChatGPT")
 

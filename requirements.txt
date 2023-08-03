@@ -1,3 +1,2 @@
 openai
 tiktoken
-python-dotenv
