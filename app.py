@@ -36,31 +36,21 @@ if uploaded_file is not None:
         result = convert_to_latex(context)
         st.code(result, language='latex')
 
-        for i in range(3):
-            satisfaction = selectbox("Are you satisfied with the result?", ['Yes', 'No'], no_selection_label="", key=i)
+        satisfaction = selectbox("Are you satisfied with the result?", ['Yes', 'No'], no_selection_label="")
 
-            if satisfaction == 'Yes':
-                st.write("*Using the GPT-3.5-turbo API costs money. If you want to help keep the project free:*")
-                button(username='risiandbisi', floating=False, width=220)
-                break
-            elif satisfaction == 'No': 
-                user_input = st.text_input("Please provide specific stylistic preferences:", "", key=i+10)
+        if satisfaction == 'Yes':
+            st.write("*Using the GPT-3.5-turbo API costs money. If you want to help keep the project free:*")
+            button(username='risiandbisi', floating=False, width=220)
+        elif satisfaction == 'No': 
+            user_input = st.text_input("Please provide specific stylistic preferences:", "")
 
-                if user_input == "":
-                    st.stop()
-                else:
-                    _, is_injection = rb.detect_injection(user_input)
+            if user_input == "":
+                st.stop()
+            else:
+                _, is_injection = rb.detect_injection(user_input)
 
-                while is_injection:
-                    user_input = st.text_input("It looks like you are attempting a prompt injection. Please provide only specific stylistic preferences:", "")
-                    
-                    if user_input == "":
-                        st.stop()
-                    else:
-                        _, is_injection = rb.detect_injection(user_input)
-
+            if is_injection:
+                st.write("It looks like you are attempting a prompt injection. Please provide only specific stylistic preferences.")
+            else:
                 result = convert_to_latex(context, user_input)
                 st.code(result, language='latex')
-                i += 1
-            else:
-                st.stop()
