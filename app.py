@@ -5,13 +5,14 @@ from rebuff import Rebuff
 from utils import get_completion
 from utils import count_tokens
 from utils import convert_to_latex
+from streamlit_extras.no_default_selectbox import selectbox
 from streamlit_extras.buy_me_a_coffee import button
 
 os.environ['OPENAI_API_KEY'] = st.secrets['OPENAI_API_KEY']
-rb = Rebuff(api_token=st.secrets['REBUFF_API_KEY'], api_url="https://alpha.rebuff.ai")
+rb = Rebuff(api_token=st.secrets['REBUFF_API_KEY'])
 st.title("Convert CSV to $\LaTeX$ with ChatGPT")
 st.write("Please upload your CSV file below.")
-uploaded_file = st.file_uploader("", label_visibility="collapsed")
+uploaded_file = st.file_uploader(".", label_visibility="collapsed")
 
 if uploaded_file is not None:
     data = StringIO(uploaded_file.getvalue().decode("utf-8")).read()
@@ -35,21 +36,31 @@ if uploaded_file is not None:
         result = convert_to_latex(context)
         st.code(result, language='latex')
 
-        for i in range(10):
-            satisfaction = st.radio("Are you satisfied with the result?", ('Yes', 'No'))
+        for i in range(3):
+            satisfaction = selectbox("Are you satisfied with the result?", ['Yes', 'No'], no_selection_label="", key=i)
 
             if satisfaction == 'Yes':
-                st.write("*Using the GPT-3.5-turbo API costs money. If you want to help keep the project free, consider donating a coffee:*")
+                st.write("*Using the GPT-3.5-turbo API costs money. If you want to help keep the project free:*")
                 button(username='risiandbisi', floating=False, width=220)
                 break
-            else: 
-                user_input = st.text_input("Please provide specific stylistic preferences:", "")
-                _, is_injection = rb.detect_injection(user_input)
+            elif satisfaction == 'No': 
+                user_input = st.text_input("Please provide specific stylistic preferences:", "", key=i+10)
+
+                if user_input == "":
+                    st.stop()
+                else:
+                    _, is_injection = rb.detect_injection(user_input)
 
                 while is_injection:
                     user_input = st.text_input("It looks like you are attempting a prompt injection. Please provide only specific stylistic preferences:", "")
-                    _, is_injection = rb.detect_injection(user_input)
+                    
+                    if user_input == "":
+                        st.stop()
+                    else:
+                        _, is_injection = rb.detect_injection(user_input)
 
                 result = convert_to_latex(context, user_input)
                 st.code(result, language='latex')
                 i += 1
+            else:
+                st.stop()
