@@ -10,7 +10,7 @@ from streamlit_extras.buy_me_a_coffee import button
 
 os.environ['OPENAI_API_KEY'] = st.secrets['OPENAI_API_KEY']
 rb = Rebuff(api_token=st.secrets['REBUFF_API_KEY'])
-st.title("Convert CSV to $\LaTeX$ with ChatGPT")
+st.title("Convert CSV to $\LaTeX$ with GPT-3.5")
 st.write("Please upload your CSV file below.")
 uploaded_file = st.file_uploader(".", label_visibility="collapsed")
 
